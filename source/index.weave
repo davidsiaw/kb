@@ -170,7 +170,8 @@ empty_page '', 'My first weaver page' do
             end
             key '{', '['
             key '}', ']'
-            key '|', '\\', length: :b
+            fkey 'Enter', length: :l2
+            # key '|', '\\', length: :b
 
             row_break
             fkey 'Caps Lock', length: :c
@@ -179,7 +180,7 @@ empty_page '', 'My first weaver page' do
             end
             key ':', ';'
             key '"', "'"
-            fkey 'Enter', length: :e
+            key '"', "'"
 
             row_break
             fkey 'LShift', length: :e

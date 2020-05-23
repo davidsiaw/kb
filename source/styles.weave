@@ -84,6 +84,16 @@ module Styles
     end
   end
 
+  class ContentStyle
+    def initialize(arg)
+      @arg = arg
+    end
+
+    def generate
+      ["content: '#{@arg}'"]
+    end
+  end
+
   class BackgroundStyle
     def initialize(options = {})
       @options = options
@@ -130,8 +140,19 @@ module Styles
       ["border-style: #{@options[:style]}"]
     end
 
-    def color
+    def particular_radii
+      corners = %i[bottom_left bottom_right top_left top_right]
+      results = []
+      corners.each do |corner|
+        key = :"#{corner}_radius"
+        next if @options[key].nil?
 
+        results << "border-#{key.to_s.tr('_', '-')}: #{@options[key].expr[0]}"
+      end
+      results
+    end
+
+    def color
       options = @options.map do |k, v|
         if k.to_s.start_with?('color_')
           [k.to_s.sub(/^color_/, '').to_sym, v]
@@ -151,7 +172,7 @@ module Styles
     end
 
     def generate
-      radius + widths + style + color
+      radius + widths + style + color + particular_radii
     end
   end
 
@@ -337,7 +358,15 @@ class LinearGradientExpression
   end
 
   def colors
-    @args[1..-1].map { |color| color.expr }.join(', ')
+    exprs = []
+    @args[1..-1].each do |arg|
+      if arg.is_a? ColorExpression
+        exprs << arg.expr[0]
+      else
+        exprs[-1] = exprs[-1] + ' ' + arg.expr[0]
+      end
+    end
+    exprs.join(', ')
   end
 
   def expr
@@ -605,6 +634,150 @@ raw_page 'main.css', '' do
     style_for '.key.stype' do
       width 355.px
     end
+
+    style_for '.key.l1type' do
+      # right side up L shape enter
+      position :relative
+      width 110.px
+    end
+
+    style_for '.key.l1type:before' do
+      # upper border
+      border color_top: rgb('ece8e4'),
+             color_vertical: rgb('dedad6'),
+             color_bottom: rgb('c9c4c4')
+      background color: rgb('e8e5e4')
+      content ''
+      height 70.px
+      left 32.px
+      position :absolute
+      top -65.px
+      width 86.px
+      border top: 3.px, vertical: 8.px, bottom: 0.px
+      border style: :solid
+      border radius: 4.px
+    end
+
+    style_for '.keycap.l1type' do
+      position :relative
+    end
+
+    style_for '.l1type .keycap:before' do
+      # inner corner rounding
+      background color: rgb('black') # e8e5e4
+      content ''
+      width 3.px
+      height 3.px
+      left 29.px
+      position :absolute
+      top -6.px
+      border radius: 2.px
+      box_shadow x: 2.px, y:2.px, blur: 0.px, spread: 1.px, color: rgb('e8e5e4')
+    end
+
+    style_for '.l1type .keycap:after' do
+      # upper fill
+      background image: linear_gradient(:left,
+                                        rgb('f0eeec'),
+                                        rgb('f5f3f1'), :'22%',
+                                        rgb('e5e2e1'))
+      content ''
+      height 70.px
+      left 40.px
+      position :absolute
+      top -62.px
+      width 70.px
+      border radius: 4.px
+      border bottom_left_radius: 0.px
+    end
+
+    style_for '.l1type:after' do
+      background color: rgba(0, 0, 0, 0)
+      content ''
+      height 20.px
+      left 28.px
+      position :absolute
+      top -20.px
+      width 12.px
+      border color: rgb('dad6d3'),
+             color_vertical: rgb('dedad6')
+      border radius: 3.px
+      border style: :solid
+      border all: 0.px, bottom: 3.px, right: 8.px
+    end
+
+
+    style_for '.key.l2type' do
+      # up side down L shape enter
+      position :relative
+      width 70.px
+    end
+
+    style_for '.key.l2type:before' do
+      # lower border
+      border color_top: rgb('ece8e4'),
+             color_vertical: rgb('dedad6'),
+             color_bottom: rgb('c9c4c4')
+      background color: rgb('e8e5e4')
+      content ''
+      height 80.px
+      left 12.px
+      position :absolute
+      top 37.px
+      width 66.px
+      border top: 0.px, vertical: 8.px, bottom: 10.px
+      border style: :solid
+      border radius: 4.px
+    end
+
+    style_for '.keycap.l2type' do
+      position :relative
+    end
+
+    style_for '.l2type .keycap:before' do
+      # inner corner rounding
+      background color: rgb('black') # e8e5e4
+      content ''
+      width 3.px
+      height 3.px
+      left 9.px
+      position :absolute
+      top 55.px
+      border radius: 2.px
+      box_shadow x: 2.px, y:-2.px, blur: 0.px, spread: 1.px, color: rgb('e8e5e4')
+    end
+
+    style_for '.l2type .keycap:after' do
+      # upper fill
+      background image: linear_gradient(:left,
+                                        rgb('eeebea'),
+                                        rgb('f5f3f1'), :'27%',
+                                        rgb('e5e2e1'))
+      content ''
+      height 70.px
+      left 20.px
+      position :absolute
+      top 37.px
+      width 50.px
+      border radius: 4.px
+      border top_left_radius: 0.px
+    end
+
+    style_for '.l2type:after' do
+      background color: rgba(0, 0, 0, 0)
+      content ''
+      height 19.px
+      left 8.px
+      position :absolute
+      top 45.px
+      width 12.px
+      border color: rgb('c0bbbb'),
+             color_vertical: rgb('dedad6')
+      border radius: 3.px
+      border style: :solid
+      border all: 0.px, top: 10.px, right: 8.px
+    end
+
 
     style_for '.key:hover' do
       color rgb('676a6c')
