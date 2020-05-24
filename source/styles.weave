@@ -29,9 +29,13 @@ raw_page 'main.css', '' do
       display :inline_block
     end
 
+    style_for '.first-key' do
+      display :block
+    end
+
     style_for '.row_space' do
       display :block
-      height 20.px
+      height 22.px
     end
 
     style_for '.column_space' do
@@ -328,6 +332,16 @@ raw_page 'main.css', '' do
 
     style_for '.numpad_sub_label' do
       font size: 13.px
+      display :block
+    end
+
+    style_for '.cram_main_label' do
+      font size: 14.px
+    end
+
+    style_for '.cram_sub_label' do
+      font size: 14.px
+      display :block
     end
 
     style_for '.side' do

@@ -1,5 +1,5 @@
 module Keyboard
-  def build_ansi_keyboard
+  def build_fat_keyboard
     outer_row do
       key_block do
         key '~', '`', keyid: 'kBackquote'
@@ -15,7 +15,8 @@ module Keyboard
         key ')', '0', keyid: 'kDigit0'
         key '_', '-', keyid: 'kMinus'
         key '+', '=', keyid: 'kEqual'
-        fkey 'Backspace', length: :d, keyid: 'kBackspace'
+        key '|', '\\', keyid: 'kBackslash'
+        fkey 'Bksp', keyid: 'kBackspace'
 
         row_break
         fkey 'Tab', length: :b, keyid: 'kTab'
@@ -24,7 +25,6 @@ module Keyboard
         end
         key '{', '[', keyid: 'kBracketLeft'
         key '}', ']', keyid: 'kBracketRight'
-        key '|', '\\', length: :b, keyid: 'kBackslash'
 
         row_break
         fkey 'Caps Lock', length: :c, keyid: 'kCapsLock'
@@ -33,7 +33,7 @@ module Keyboard
         end
         key ':', ';', keyid: 'kSemicolon'
         key '"', "'", keyid: 'kQuote'
-        fkey 'Enter', length: :e, keyid: 'kEnter'
+        fkey 'Enter', length: :l1, keyid: 'kEnter'
 
         row_break
         fkey 'LShift', length: :e, keyid: 'kShiftLeft'

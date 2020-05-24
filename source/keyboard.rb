@@ -7,43 +7,66 @@ end
 module Keyboard
   def key(name, second = '', type: nil, length: nil, keyid: nil)
     lenclass = lenclass_for(length)
-    classes = ['white', type, 'key', lenclass, keyid].compact.join(' ')
-    element_opts = { class: classes }
-    div class: 'keyholder' do
+    classes = ['white', type, 'key', lenclass, keyid]
+    element_opts = { class: classes.compact.join(' ') }
+    khclass = 'keyholder'
+    khclass = 'first-key' if @row_break
+    @row_break = false
+    div class: khclass do
       if type == :function
         a element_opts do
           div class: :keycap do
-            span name
-            span second, class: :side
+            extend Keyboard
+            symbol name
+            symbol second, class: :side
           end
         end
       elsif type == :control
         a element_opts do
           div class: :keycap do
-            span name
+            extend Keyboard
+            symbol name
             br
-            span second
+            symbol second
           end
         end
       elsif type == :numpad
         a element_opts do
           div class: :keycap do
             div class: :numpad_label do
-              div name, class: :numpad_main_label
-              div second, class: :numpad_sub_label
+              extend Keyboard
+              symbol name, class: :numpad_main_label
+              symbol second, class: :numpad_sub_label
+            end
+          end
+        end
+      elsif type == :doublecram
+        a element_opts do
+          div class: :keycap do
+            div class: :numpad_label do
+              extend Keyboard
+              symbol name, class: :cram_main_label
+              symbol second, class: :cram_sub_label
             end
           end
         end
       else
         a element_opts do
           div class: :keycap do
-            span name
+            extend Keyboard
+            symbol name
             br
-            span second
+            symbol second
           end
         end
       end
     end
+  end
+
+  def symbol(*args)
+    return icon(args[0]) if args[0].is_a? Symbol
+
+    span(*args)
   end
 
   def fkey(name, second = '', length: nil, keyid: nil)
@@ -56,6 +79,10 @@ module Keyboard
 
   def nkey(name, second = '', length: nil, keyid: nil)
     key(name, second, type: :numpad, length: length, keyid: keyid)
+  end
+
+  def dkey(name, second = '', length: nil, keyid: nil)
+    key(name, second, type: :doublecram, length: length, keyid: keyid)
   end
 
   def lenclass_for(length)
@@ -107,6 +134,7 @@ module Keyboard
   end
 
   def row_break
+    @row_break = true
     div class: :inner_row do
     end
   end
@@ -142,67 +170,6 @@ module Keyboard
         }
       });
     SCRIPT
-  end
-
-  def build_ansi_keyboard
-    outer_row do
-      key_block do
-        key '~', '`', keyid: 'kBackquote'
-        key '!', '1', keyid: 'kDigit1'
-        key '@', '2', keyid: 'kDigit2'
-        key '#', '3', keyid: 'kDigit3'
-        key '$', '4', keyid: 'kDigit4'
-        key '%', '5', keyid: 'kDigit5'
-        key '^', '6', keyid: 'kDigit6'
-        key '&', '7', keyid: 'kDigit7'
-        key '*', '8', keyid: 'kDigit8'
-        key '(', '9', keyid: 'kDigit9'
-        key ')', '0', keyid: 'kDigit0'
-        key '_', '-', keyid: 'kMinus'
-        key '+', '=', keyid: 'kEqual'
-        fkey 'Backspace', length: :d, keyid: 'kBackspace'
-
-        row_break
-        fkey 'Tab', length: :b, keyid: 'kTab'
-        'qwertyuiop'.split('').each do |x|
-          key x.upcase, keyid: "kKey#{x.upcase}"
-        end
-        key '{', '[', keyid: 'kBracketLeft'
-        key '}', ']', keyid: 'kBracketRight'
-        key '|', '\\', length: :b, keyid: 'kBackslash'
-
-        row_break
-        fkey 'Caps Lock', length: :c, keyid: 'kCapsLock'
-        'asdfghjkl'.split('').each do |x|
-          key x.upcase, keyid: "kKey#{x.upcase}"
-        end
-        key ':', ';', keyid: 'kSemicolon'
-        key '"', "'", keyid: 'kQuote'
-        fkey 'Enter', length: :e, keyid: 'kEnter'
-
-        row_break
-        fkey 'LShift', length: :e, keyid: 'kShiftLeft'
-        'zxcvbnm'.split('').each do |x|
-          key x.upcase, keyid: "kKey#{x.upcase}"
-        end
-        key '<', ',', keyid: 'kComma'
-        key '>', '.', keyid: 'kPeriod'
-        key '?', '/', keyid: 'kSlash '
-        fkey 'RShift', length: :f, keyid: 'kShiftRight'
-
-        row_break
-        fkey 'LCtrl', length: :a, keyid: 'kControlLeft'
-        fkey 'LOS', length: :a, keyid: 'kMetaLeft'
-        fkey 'LAlt', length: :a, keyid: 'kAltLeft'
-
-        fkey '', length: :s, keyid: 'kSpace'
-
-        fkey 'RAlt', length: :a, keyid: 'kAltRight'
-        fkey 'ROS', length: :a, keyid: 'kMetaRight'
-        fkey 'Menu', length: :a, keyid: 'kContextMenu'
-        fkey 'RCtrl', length: :a, keyid: 'kControlRight'
-      end
-    end
   end
 
   def build_function_keys
@@ -260,15 +227,17 @@ module Keyboard
       end
 
       outer_row do
-        key_block style: 'position: relative; top:34px; left:73px;' do
-          key '↑', keyid: 'kArrowUp'
+        key_block style: 'position: relative; top:31px; left:73px;' do
+          key :'long-arrow-up', keyid: 'kArrowUp'
         end
         row_break
-        key_block style: 'position: relative; top:25px; left:13px;' do
-          key '←', keyid: 'kArrowLeft'
-          key '↓', keyid: 'kArrowDown'
-          key '→', keyid: 'kArrowRight'
+        key_block style: 'position: relative; top:22px; left:13px;' do
+          key :'long-arrow-left', keyid: 'kArrowLeft'
+          key :'long-arrow-down', keyid: 'kArrowDown'
+          key :'long-arrow-right', keyid: 'kArrowRight'
         end
+      end
+      outer_row do
       end
     end
   end

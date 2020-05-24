@@ -9,6 +9,19 @@ empty_page '', 'My first weaver page' do
     extend Keyboard
     respond_to_keys!
 
+    %i[
+      ansi
+      fat
+      nmb_rt102
+      test
+    ].each do |layout|
+      h1 layout.to_s
+      keyboard(layout,
+               nav_keys: false,
+               ten_keys: false,
+               func_keys: false)
+    end
+
     (0..15).each do |x|
       n = x & 1
       t = (x >> 1) & 1
